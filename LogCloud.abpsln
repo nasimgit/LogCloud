@@ -1,0 +1,53 @@
+{
+  "id": "71c668c3-0774-4e4c-b589-aed4e6ba0f53",
+  "template": "app",
+  "versions": {
+    "AbpFramework": "9.2.0",
+    "AbpStudio": "1.0.1",
+    "TargetDotnetFramework": "net9.0"
+  },
+  "modules": {
+    "LogCloud": {
+      "path": "LogCloud.abpmdl"
+    }
+  },
+  "runProfiles": {
+    "Default": {
+      "path": "etc/abp-studio/run-profiles/Default.abprun.json"
+    }
+  },
+  "options": {
+    "httpRequests": {
+      "ignoredUrls": [
+      
+      ]
+    }
+  },
+  "creatingStudioConfiguration": {
+    "template": "app",
+    "createdAbpStudioVersion": "1.0.1",
+    "tiered": "false",
+    "runInstallLibs": "true",
+    "useLocalReferences": "false",
+    "multiTenancy": "false",
+    "includeTests": "true",
+    "kubernetesConfiguration": "false",
+    "uiFramework": "no-ui",
+    "mobileFramework": "none",
+    "distributedEventBus": "none",
+    "databaseProvider": "ef",
+    "runDbMigrator": "true",
+    "databaseManagementSystem": "sqlserver",
+    "separateTenantSchema": "false",
+    "createInitialMigration": "true",
+    "theme": "leptonx-lite",
+    "themeStyle": "",
+    "themeMenuPlacement": "",
+    "mobileFramework": "none",
+    "publicWebsite": "false",
+    "socialLogin": "false",
+    "selectedLanguages": ["English", "English (United Kingdom)", "简体中文", "Español", "العربية", "हिन्दी", "Português (Brasil)", "Français", "Русский", "Deutsch (Deuthschland)", "Türkçe", "Italiano", "Čeština", "Magyar", "Română (România)", "Svenska", "Suomi", "Slovenčina", "Íslenska", "繁體中文", ],
+    "defaultLanguage": "English",
+    "createCommand": "abp new LogCloud -t app --database-provider ef --database-management-system sqlserver --theme leptonx-lite --without-cms-kit --sample-crud-page --dont-run-bundling --no-multi-tenancy --no-social-logins -no-gdpr -no-openiddict-admin-ui -no-audit-logging -no-file-management -no-language-management -no-text-template-management"
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "template": "app",
+  "imports": {
+    "Volo.Abp.LeptonXLiteTheme": {
+      "version": "4.2.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.Account": {
+      "version": "9.2.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.OpenIddict": {
+      "version": "9.2.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.Identity": {
+      "version": "9.2.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.SettingManagement": {
+      "version": "9.2.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.PermissionManagement": {
+      "version": "9.2.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.FeatureManagement": {
+      "version": "9.2.0",
+      "isInstalled": true
+    }
+  },
+  "folders": {
+    "items": {
+      "src": {},
+      "test": {}
+    }
+  },
+  "packages": {
+    "LogCloud.Application": {
+      "path": "src/LogCloud.Application/LogCloud.Application.abppkg",
+      "folder": "src"
+    },
+    "LogCloud.Application.Tests": {
+      "path": "test/LogCloud.Application.Tests/LogCloud.Application.Tests.abppkg",
+      "folder": "test"
+    },
+    "LogCloud.Domain.Shared": {
+      "path": "src/LogCloud.Domain.Shared/LogCloud.Domain.Shared.abppkg",
+      "folder": "src"
+    },
+    "LogCloud.Application.Contracts": {
+      "path": "src/LogCloud.Application.Contracts/LogCloud.Application.Contracts.abppkg",
+      "folder": "src"
+    },
+    "LogCloud.HttpApi": {
+      "path": "src/LogCloud.HttpApi/LogCloud.HttpApi.abppkg",
+      "folder": "src"
+    },
+    "LogCloud.HttpApi.Client": {
+      "path": "src/LogCloud.HttpApi.Client/LogCloud.HttpApi.Client.abppkg",
+      "folder": "src"
+    },
+    "LogCloud.EntityFrameworkCore.Tests": {
+      "path": "test/LogCloud.EntityFrameworkCore.Tests/LogCloud.EntityFrameworkCore.Tests.abppkg",
+      "folder": "test"
+    },
+    "LogCloud.EntityFrameworkCore": {
+      "path": "src/LogCloud.EntityFrameworkCore/LogCloud.EntityFrameworkCore.abppkg",
+      "folder": "src"
+    },
+    "LogCloud.TestBase": {
+      "path": "test/LogCloud.TestBase/LogCloud.TestBase.abppkg",
+      "folder": "test"
+    },
+    "LogCloud.Domain.Tests": {
+      "path": "test/LogCloud.Domain.Tests/LogCloud.Domain.Tests.abppkg",
+      "folder": "test"
+    },
+    "LogCloud.HttpApi.Client.ConsoleTestApp": {
+      "path": "test/LogCloud.HttpApi.Client.ConsoleTestApp/LogCloud.HttpApi.Client.ConsoleTestApp.abppkg",
+      "folder": "test"
+    },
+    "LogCloud.DbMigrator": {
+      "path": "src/LogCloud.DbMigrator/LogCloud.DbMigrator.abppkg",
+      "folder": "src"
+    },
+    "LogCloud.HttpApi.Host": {
+      "path": "src/LogCloud.HttpApi.Host/LogCloud.HttpApi.Host.abppkg",
+      "folder": "src"
+    },
+    "LogCloud.Domain": {
+      "path": "src/LogCloud.Domain/LogCloud.Domain.abppkg",
+      "folder": "src"
+    }
+  }
+}
