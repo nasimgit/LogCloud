@@ -46,17 +46,25 @@ public class Program
             //    });
 
 
-            // serilog config programmatically
+            // Serilog config programmatically for Google Cloud Logging
             {
                 var options = new GoogleCloudLoggingSinkOptions
                 {
-                    ProjectId = "My Project 80810",
-                    ResourceType = "gce_instance",
-                    LogName = "someLogName",
-                    UseSourceContextAsLogName = true,
+                    ProjectId = "<YOUR_GCP_PROJECT_ID>", // TODO: Set your Google Cloud Project ID here
+                    ResourceType = "global",             // Or another type, e.g., "gce_instance" if running on GCE
+                    LogName = "logcloud-app",             // Optional: customize your log name
+                    UseSourceContextAsLogName = true,      // Optional
                 };
 
-                builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console().WriteTo.GoogleCloudLogging(options).MinimumLevel.Is(LogEventLevel.Verbose));
+                // IMPORTANT: Set the GOOGLE_APPLICATION_CREDENTIALS environment variable to your service account JSON file path
+                // Example (Windows):
+                // set GOOGLE_APPLICATION_CREDENTIALS=E:\path\to\your-service-account.json
+
+                builder.Host.UseSerilog((ctx, lc) =>
+                    lc.WriteTo.Console()
+                      .WriteTo.GoogleCloudLogging(options)
+                      .MinimumLevel.Is(LogEventLevel.Information) // Set to Information for production
+                );
             }
 
             await builder.AddApplicationAsync<LogCloudHttpApiHostModule>();
