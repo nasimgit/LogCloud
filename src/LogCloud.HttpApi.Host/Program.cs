@@ -26,94 +26,104 @@ public class Program
         {
             Log.Information("Starting LogCloud.HttpApi.Host.");
             var builder = WebApplication.CreateBuilder(args);
-            //builder.Host
-            //    .AddAppSettingsSecretsJson()
-            //    .UseAutofac()
-            //    .UseSerilog((context, services, loggerConfiguration) =>
-            //    {
-            //        loggerConfiguration
-            //        #if DEBUG
-            //            .MinimumLevel.Debug()
-            //        #else
-            //            .MinimumLevel.Information()
-            //        #endif
-            //            .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-            //            .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
-            //            .Enrich.FromLogContext()
-            //            .WriteTo.Async(c => c.File("Logs/logs.txt"))
-            //            .WriteTo.Async(c => c.Console())
-            //            .WriteTo.Async(c => c.AbpStudio(services));
-            //    });
-
-
-            // Serilog config programmatically for Google Cloud Logging
-            {
-                var options = new GoogleCloudLoggingSinkOptions
+            builder.Host
+                .AddAppSettingsSecretsJson()
+                .UseAutofac()
+                .UseSerilog((context, services, loggerConfiguration) =>
                 {
-                    ProjectId = "<YOUR_GCP_PROJECT_ID>", // TODO: Set your Google Cloud Project ID here
-                    ResourceType = "global",             // Or another type, e.g., "gce_instance" if running on GCE
-                    LogName = "logcloud-app",             // Optional: customize your log name
-                    UseSourceContextAsLogName = true,      // Optional
-                };
+                    loggerConfiguration
+#if DEBUG
+                        .MinimumLevel.Debug()
+#else
+                        .MinimumLevel.Information()
+#endif
+                        .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                        .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+                        .Enrich.FromLogContext()
+                        .WriteTo.Async(c => c.File("Logs/logs.txt"))
+                        .WriteTo.Async(c => c.Console())
+                        .WriteTo.Async(c => c.AbpStudio(services));
+                });
 
-                // IMPORTANT: Set the GOOGLE_APPLICATION_CREDENTIALS environment variable to your service account JSON file path
-                // Example (Windows):
-                // set GOOGLE_APPLICATION_CREDENTIALS=E:\path\to\your-service-account.json
+            #region GCP Serilog Sink
+            // Serilog config programmatically for Google Cloud Logging
+            //{
+            //    var options = new GoogleCloudLoggingSinkOptions
+            //    {
+            //        ProjectId = "<YOUR_GCP_PROJECT_ID>", // TODO: Set your Google Cloud Project ID here
+            //        ResourceType = "global",             // Or another type, e.g., "gce_instance" if running on GCE
+            //        LogName = "logcloud-app",             // Optional: customize your log name
+            //        UseSourceContextAsLogName = true,      // Optional
+            //    };
 
-                builder.Host.UseSerilog((ctx, lc) =>
-                    lc.WriteTo.Console()
-                      .WriteTo.GoogleCloudLogging(options)
-                      .MinimumLevel.Is(LogEventLevel.Information) // Set to Information for production
-                );
-            }
+            //    // IMPORTANT: Set the GOOGLE_APPLICATION_CREDENTIALS environment variable to your service account JSON file path
+            //    // Example (Windows):
+            //    // set GOOGLE_APPLICATION_CREDENTIALS=E:\path\to\your-service-account.json
+
+            //    builder.Host.UseSerilog((ctx, lc) =>
+            //        lc.WriteTo.Console()
+            //          .WriteTo.GoogleCloudLogging(options)
+            //          .MinimumLevel.Is(LogEventLevel.Information) // Set to Information for production
+            //    );
+            //}
+            #endregion
+
+
+
+
+
 
             await builder.AddApplicationAsync<LogCloudHttpApiHostModule>();
             var app = builder.Build();
             app.UseSerilogRequestLogging();
-            app.MapGet("/", ([FromServices] Microsoft.Extensions.Logging.ILogger<Program> _logger, [FromServices] ILoggerFactory _loggerFactory) =>
-            {
-                Log.Information("Test info message with serilog");
-                Log.Debug("Test debug message with serilog");
 
-                _logger.LogInformation("Test info message with ILogger abstraction");
-                _logger.LogDebug("Test debug message with ILogger abstraction");
+            #region GCP Serilog Sink 2 
+            //app.MapGet("/", ([FromServices] Microsoft.Extensions.Logging.ILogger<Program> _logger, [FromServices] ILoggerFactory _loggerFactory) =>
+            //{
+            //    Log.Information("Test info message with serilog");
+            //    Log.Debug("Test debug message with serilog");
 
-                // ASP.NET Logger Factory accepts custom log names but these must follow the rules for Google Cloud logging:
-                // https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry
-                // Names must only include upper and lower case alphanumeric characters, forward-slash, underscore, hyphen, and period. No spaces!
-                var anotherLogger = _loggerFactory.CreateLogger("AnotherLogger");
-                anotherLogger.LogInformation("Test message with ILoggerFactory abstraction and custom log name");
+            //    _logger.LogInformation("Test info message with ILogger abstraction");
+            //    _logger.LogDebug("Test debug message with ILogger abstraction");
 
-                _logger.LogInformation(eventId: new Random().Next(), message: "Test message with random event ID");
-                _logger.LogInformation("Test message with List<string> {list}", new List<string> { "foo", "bar", "pizza" });
-                _logger.LogInformation("Test message with List<int> {list}", new List<int> { 123, 456, 7890 });
-                _logger.LogInformation("Test message with Dictionary<string,object> {dict}", new Dictionary<string, object>
-            {
-                { "valueAsNull", null },
-                { "valueAsBool", true },
-                { "valueAsString", "qwerty" },
-                { "valueAsStringNumber", "00000" },
-                { "valueAsMaxInt", int.MaxValue },
-                { "valueAsMaxLong", long.MaxValue },
-                { "valueAsDouble", 123.456 },
-                { "valueAsMaxDouble", double.MaxValue },
-                { "valueAsMaxDecimal", decimal.MaxValue },
-            });
+            //    // ASP.NET Logger Factory accepts custom log names but these must follow the rules for Google Cloud logging:
+            //    // https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry
+            //    // Names must only include upper and lower case alphanumeric characters, forward-slash, underscore, hyphen, and period. No spaces!
+            //    var anotherLogger = _loggerFactory.CreateLogger("AnotherLogger");
+            //    anotherLogger.LogInformation("Test message with ILoggerFactory abstraction and custom log name");
 
-                try
-                {
-                    throw new Exception("Testing exception logging");
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError(e, "");
-                }
+            //    _logger.LogInformation(eventId: new Random().Next(), message: "Test message with random event ID");
+            //    _logger.LogInformation("Test message with List<string> {list}", new List<string> { "foo", "bar", "pizza" });
+            //    _logger.LogInformation("Test message with List<int> {list}", new List<int> { 123, 456, 7890 });
+            //    _logger.LogInformation("Test message with Dictionary<string,object> {dict}", new Dictionary<string, object>
+            //{
+            //    { "valueAsNull", null },
+            //    { "valueAsBool", true },
+            //    { "valueAsString", "qwerty" },
+            //    { "valueAsStringNumber", "00000" },
+            //    { "valueAsMaxInt", int.MaxValue },
+            //    { "valueAsMaxLong", long.MaxValue },
+            //    { "valueAsDouble", 123.456 },
+            //    { "valueAsMaxDouble", double.MaxValue },
+            //    { "valueAsMaxDecimal", decimal.MaxValue },
+            //});
 
-                var url = $"https://console.cloud.google.com/logs/viewer";
-                var html = $"<html><body>Logged messages at {DateTime.UtcNow:O}, visit GCP log viewer at <a href='{url}' target='_blank'>{url}</a></body></html>";
+            //    try
+            //    {
+            //        throw new Exception("Testing exception logging");
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        _logger.LogError(e, "");
+            //    }
 
-                return Results.Content(html, "text/html");
-            });
+            //    var url = $"https://console.cloud.google.com/logs/viewer";
+            //    var html = $"<html><body>Logged messages at {DateTime.UtcNow:O}, visit GCP log viewer at <a href='{url}' target='_blank'>{url}</a></body></html>";
+
+            //    return Results.Content(html, "text/html");
+            //});
+            #endregion
+
 
             await app.InitializeApplicationAsync();
             await app.RunAsync();
