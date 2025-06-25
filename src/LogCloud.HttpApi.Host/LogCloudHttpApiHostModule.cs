@@ -272,7 +272,7 @@ public class LogCloudHttpApiHostModule : AbpModule
             options.OAuthClientId(configuration["AuthServer:SwaggerClientId"]);
         });
         app.UseAuditing();
-        app.UseAbpSerilogEnrichers();
+       // app.UseAbpSerilogEnrichers();
         app.UseConfiguredEndpoints();
     }
 }

@@ -31,19 +31,13 @@ public class Program
                 .UseAutofac()
                 .UseSerilog((context, services, loggerConfiguration) =>
                 {
-                    loggerConfiguration
-#if DEBUG
-                        .MinimumLevel.Debug()
-#else
-                        .MinimumLevel.Information()
-#endif
-                        .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-                        .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
-                        .Enrich.FromLogContext()
-                        .WriteTo.Async(c => c.File("Logs/logs.txt"))
-                        .WriteTo.Async(c => c.Console())
-                        .WriteTo.Async(c => c.AbpStudio(services));
+                    loggerConfiguration.ReadFrom.Configuration(context.Configuration);
                 });
+
+            //builder.Host.UseSerilog((context, loggerConfig) =>
+            //{
+            //    loggerConfig.ReadFrom.Configuration(context.Configuration);
+            //});
 
             #region GCP Serilog Sink
             // Serilog config programmatically for Google Cloud Logging
@@ -75,7 +69,7 @@ public class Program
 
             await builder.AddApplicationAsync<LogCloudHttpApiHostModule>();
             var app = builder.Build();
-            app.UseSerilogRequestLogging();
+          //  app.UseSerilogRequestLogging();
 
             #region GCP Serilog Sink 2 
             //app.MapGet("/", ([FromServices] Microsoft.Extensions.Logging.ILogger<Program> _logger, [FromServices] ILoggerFactory _loggerFactory) =>
