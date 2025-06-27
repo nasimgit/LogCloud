@@ -12,6 +12,7 @@ using Volo.Abp.Domain.Repositories;
 
 namespace LogCloud.Books;
 
+//[Intercept(typeof(RequestLoggingInterceptor))]
 [Authorize(LogCloudPermissions.Books.Default)]
 public class BookAppService : ApplicationService, IBookAppService
 {
@@ -24,8 +25,7 @@ public class BookAppService : ApplicationService, IBookAppService
 
     public async Task<BookDto> GetAsync(Guid id)
     {
-        throw new UserFriendlyException("An unexpected error occurred while fetching the book.");
-
+        throw new Exception("Test exception from GetAsync");
         var book = await _repository.GetAsync(id);
         return ObjectMapper.Map<Book, BookDto>(book);
     }

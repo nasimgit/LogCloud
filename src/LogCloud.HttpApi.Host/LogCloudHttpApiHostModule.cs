@@ -1,44 +1,47 @@
+using LogCloud.Books;
+using LogCloud.EntityFrameworkCore;
+using LogCloud.HealthChecks;
+using LogCloud.Middleware;
+using LogCloud.MultiTenancy;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
+using OpenIddict.Server.AspNetCore;
+using OpenIddict.Validation.AspNetCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Extensions.DependencyInjection;
-using OpenIddict.Validation.AspNetCore;
-using OpenIddict.Server.AspNetCore;
-using LogCloud.EntityFrameworkCore;
-using LogCloud.MultiTenancy;
-using LogCloud.HealthChecks;
-using Microsoft.OpenApi.Models;
 using Volo.Abp;
-using Volo.Abp.Studio;
 using Volo.Abp.Account;
 using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc;
-using Volo.Abp.Autofac;
-using Volo.Abp.Localization;
-using Volo.Abp.Modularity;
-using Volo.Abp.UI.Navigation.Urls;
-using Volo.Abp.VirtualFileSystem;
+using Volo.Abp.AspNetCore.Mvc.UI;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
-using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
-using Microsoft.AspNetCore.Hosting;
+using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
+using Volo.Abp.Autofac;
 using Volo.Abp.Identity;
+using Volo.Abp.Localization;
+using Volo.Abp.Modularity;
 using Volo.Abp.OpenIddict;
-using Volo.Abp.Swashbuckle;
-using Volo.Abp.Studio.Client.AspNetCore;
 using Volo.Abp.Security.Claims;
+using Volo.Abp.Studio;
+using Volo.Abp.Studio.Client.AspNetCore;
+using Volo.Abp.Swashbuckle;
+using Volo.Abp.UI.Navigation.Urls;
+using Volo.Abp.VirtualFileSystem;
 
 namespace LogCloud;
 
@@ -97,6 +100,13 @@ public class LogCloudHttpApiHostModule : AbpModule
             Microsoft.IdentityModel.Logging.IdentityModelEventSource.LogCompleteSecurityArtifact = true;
         }
 
+        //Configure<AbpDynamicProxyOptions>(options =>
+        //{
+        //    options.Interceptors.Add<RequestLoggingInterceptor>(service =>
+        //        service.ServiceType == typeof(BookAppService) // only intercept BookAppService
+        //    );
+        //});
+
         if (!configuration.GetValue<bool>("AuthServer:RequireHttpsMetadata"))
         {
             Configure<OpenIddictServerAspNetCoreOptions>(options =>
@@ -118,6 +128,11 @@ public class LogCloudHttpApiHostModule : AbpModule
         ConfigureSwagger(context, configuration);
         ConfigureVirtualFileSystem(context);
         ConfigureCors(context, configuration);
+
+        context.Services.AddControllersWithViews(options =>
+        {
+            options.Filters.Add(typeof(LogCloud.Middleware.GlobalExceptionLoggingFilter));
+        });
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)
@@ -253,11 +268,15 @@ public class LogCloudHttpApiHostModule : AbpModule
         app.UseCors();
         app.UseAuthentication();
         app.UseAbpOpenIddictValidation();
+       
 
         if (MultiTenancyConsts.IsEnabled)
         {
             app.UseMultiTenancy();
         }
+        app.UseMiddleware<RequestLogContextMiddleware>();
+        app.UseMiddleware<RequestLoggingMiddleware>();
+
 
         app.UseUnitOfWork();
         app.UseDynamicClaims();
